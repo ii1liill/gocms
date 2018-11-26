@@ -3,7 +3,7 @@ package ocms
 import (
 	"fmt"
 
-	myhttp "github.com/ii1liill/gocms/core/http"
+	myhttp "github.com/ii1liill/gocms/http"
 )
 
 // 常用常量
