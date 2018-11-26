@@ -1,4 +1,4 @@
-package ocms
+package gocms
 
 import (
 	"fmt"
@@ -11,8 +11,8 @@ const (
 	defaultAppPath = "github.com/ii1liill/gocms/app"
 )
 
-// OCms 定义核心结构体
-type OCms struct {
+// GoCms 定义核心结构体
+type GoCms struct {
 	// 应用配置项
 	Config interface{}
 	// 应用默认目录
@@ -22,9 +22,9 @@ type OCms struct {
 }
 
 // New 生成OCms对象的函数
-func New() OCms {
+func New() GoCms {
 	// fmt.Println(config.Get("tests.testsInt"))
-	o := OCms{
+	o := GoCms{
 		AppDir:   defaultAppPath,
 		BindAddr: ":8000",
 	}
@@ -32,8 +32,8 @@ func New() OCms {
 	return o
 }
 
-// Run OCms的启动方法
-func (o *OCms) Run() error {
+// Run GoCms的启动方法
+func (o *GoCms) Run() error {
 
 	// 启动http服务器
 	fmt.Println("Service running!")
