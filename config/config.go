@@ -1,12 +1,19 @@
 package config
 
-// func init() {
-// 	// 读取配置文件
-// 	viper.SetConfigType("toml")
-// 	viper.SetConfigName("app")
-// 	viper.AddConfigPath(config.AppConfigPath)
-// 	err := viper.ReadInConfig() // Find and read the config file
-// 	if err != nil {             // Handle errors reading the config file
-// 		panic(fmt.Errorf("fatal error config file: %s ", err))
-// 	}
-// }
+import (
+	"fmt"
+	"github.com/spf13/viper"
+)
+
+func SetConfigPath (configPath string) {
+	viper.SetConfigName("config")
+	viper.AddConfigPath(configPath)
+	err := viper.ReadInConfig()
+	if err != nil { // Handle errors reading the config file
+		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	}
+}
+
+func Get(key string) interface{} {
+	return viper.Get(key)
+}

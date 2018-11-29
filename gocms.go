@@ -2,6 +2,7 @@ package gocms
 
 import (
 	"fmt"
+	"github.com/ii1liill/gocms/config"
 
 	myhttp "github.com/ii1liill/gocms/http"
 )
@@ -22,8 +23,8 @@ type GoCms struct {
 }
 
 // New 生成OCms对象的函数
-func New() GoCms {
-	// fmt.Println(config.Get("tests.testsInt"))
+func New(configPath string) GoCms {
+	config.SetConfigPath(configPath)
 	o := GoCms{
 		AppDir:   defaultAppPath,
 		BindAddr: ":8000",
