@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// 初始化viper的函数
 func SetConfigPath (configPath string) {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(configPath)
@@ -14,6 +15,17 @@ func SetConfigPath (configPath string) {
 	}
 }
 
+// Get
 func Get(key string) interface{} {
-	return viper.Get(key)
+	value := viper.Get(key)
+	return value
+}
+
+//
+func GetWithCallback(key string, defaultValue interface{}) interface{} {
+	value := viper.Get(key)
+	if value == nil {
+		return defaultValue
+	}
+	return value
 }
