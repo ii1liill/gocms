@@ -2,68 +2,59 @@ package router
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"sync"
 )
 
-type GroupStack map[string]interface{}
+type GroupStack struct {
+	Prefix string
+}
 
 type Router struct {
-	GroupStack GroupStack
+	GroupStack []GroupStack
+	HttpRouter *httprouter.Router
 }
-
-var R = httprouter.New()
 
 func (router *Router) UpdateGroupStack(GroupStack GroupStack) {
-	router.GroupStack = GroupStack
+	router.GroupStack = append(router.GroupStack, GroupStack)
 }
 
-// Group 是局部作用域方法，仅在回调内部起作用
+// Group 利用匿名函数传递router
 func (router Router) Group(GroupStack GroupStack, Callback func(router Router)) {
+	router.UpdateGroupStack(GroupStack)
+	Callback(router)
+}
+
+func (router Router) Prefix(prefix string, Callback func(router Router)) {
+	GroupStack := GroupStack{Prefix: prefix}
 	router.UpdateGroupStack(GroupStack)
 	Callback(router)
 }
 
 // Handle 在执行httprouter的Handle之前先处理GroupStack
 func (router *Router) Handle(method string, path string, handle httprouter.Handle) {
-	// 处理prefix
-	if _, ok := router.GroupStack["prefix"]; ok == true {
-		path = router.GroupStack["prefix"].(string) + path
+	// prefix
+	var prefix string
+	// 处理groupStack
+	for _, groupStack := range router.GroupStack {
+		prefix += groupStack.Prefix
 	}
-	R.Handle(method, path, handle)
+	path = prefix + path
+	router.HttpRouter.Handle(method, path, handle)
 }
 
 func (router *Router) GET(path string, handle httprouter.Handle) {
 	router.Handle("GET", path, handle)
 }
 
+// 利用sync.Once方法实现单例模式生成Router对象
+var router *Router
+var once sync.Once
+
 func New() *Router {
-	router := &Router{}
+	once.Do(func() {
+		router = &Router {
+			HttpRouter: httprouter.New(),
+		}
+	})
 	return router
-}
-
-func DELETE(path string, handle httprouter.Handle) {
-	R.DELETE(path, handle)
-}
-
-func GET(path string, handle httprouter.Handle) {
-	R.GET(path, handle)
-}
-
-func HEAD(path string, handle httprouter.Handle) {
-	R.HEAD(path, handle)
-}
-
-func OPTIONS(path string, handle httprouter.Handle) {
-	R.OPTIONS(path, handle)
-}
-
-func PATCH(path string, handle httprouter.Handle) {
-	R.PATCH(path, handle)
-}
-
-func POST(path string, handle httprouter.Handle) {
-	R.POST(path, handle)
-}
-
-func PUT(path string, handle httprouter.Handle) {
-	R.PUT(path, handle)
 }

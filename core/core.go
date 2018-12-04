@@ -43,5 +43,6 @@ func (o *GoCms) Run() error {
 
 	// 启动http服务器
 	fmt.Println("Service running!")
-	return http.ListenAndServe(o.BindAddr, router.R)
+	router := router.New()
+	return http.ListenAndServe(o.BindAddr, router.HttpRouter)
 }
