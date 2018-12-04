@@ -10,9 +10,9 @@ func init() {
 
 	r.Prefix("/admin", func(r router.Router) {
 		r.GET("/", controllers.Index.Index)
-		r.GET("/hello", controllers.Index.Index)
 		r.Prefix("/test", func(r router.Router) {
 			r.GET("/a", controllers.Index.Index)
 		})
+		r.GET("/hello", controllers.Index.Index)
 	})
 }

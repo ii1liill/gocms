@@ -42,9 +42,28 @@ func (router *Router) Handle(method string, path string, handle httprouter.Handl
 	router.HttpRouter.Handle(method, path, handle)
 }
 
+func (router *Router) DELETE(path string, handle httprouter.Handle) {
+	router.Handle("DELETE", path, handle)
+}
 func (router *Router) GET(path string, handle httprouter.Handle) {
 	router.Handle("GET", path, handle)
 }
+func (router *Router) HEAD(path string, handle httprouter.Handle) {
+	router.Handle("HEAD", path, handle)
+}
+func (router *Router) OPTIONS(path string, handle httprouter.Handle) {
+	router.Handle("OPTIONS", path, handle)
+}
+func (router *Router) PATCH(path string, handle httprouter.Handle) {
+	router.Handle("PATCH", path, handle)
+}
+func (router *Router) POST(path string, handle httprouter.Handle) {
+	router.Handle("POST", path, handle)
+}
+func (router *Router) PUT(path string, handle httprouter.Handle) {
+	router.Handle("PUT", path, handle)
+}
+
 
 // 利用sync.Once方法实现单例模式生成Router对象
 var router *Router
