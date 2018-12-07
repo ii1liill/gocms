@@ -5,8 +5,15 @@ import (
 	"sync"
 )
 
+type Params httprouter.Params
+
+type Handle httprouter.Handle
+
+type Middleware func(handle httprouter.Handle) httprouter.Handle
+
 type GroupStack struct {
 	Prefix string
+	Middleware Middleware
 }
 
 type Router struct {
@@ -24,21 +31,38 @@ func (router Router) Group(GroupStack GroupStack, Callback func(router Router)) 
 	Callback(router)
 }
 
+// Prefix 路由路径前缀
 func (router Router) Prefix(prefix string, Callback func(router Router)) {
 	GroupStack := GroupStack{Prefix: prefix}
 	router.UpdateGroupStack(GroupStack)
 	Callback(router)
 }
 
-// Handle 在执行httprouter的Handle之前先处理GroupStack
-func (router *Router) Handle(method string, path string, handle httprouter.Handle) {
+// Middleware 路由中间件
+func (router Router) Middleware(middleware Middleware, Callback func(router Router)) {
+	GroupStack := GroupStack{Middleware: middleware}
+	router.UpdateGroupStack(GroupStack)
+	Callback(router)
+}
+
+// PrepareGroupStack 处理GroupStack
+func (router Router) PrepareGroupStack(method string, path string, handle httprouter.Handle) (string, httprouter.Handle) {
 	// prefix
 	var prefix string
 	// 处理groupStack
 	for _, groupStack := range router.GroupStack {
+		if groupStack.Middleware != nil {
+			handle = groupStack.Middleware(handle)
+		}
 		prefix += groupStack.Prefix
 	}
 	path = prefix + path
+	return path, handle
+}
+
+// Handle 在执行httprouter的Handle之前先处理GroupStack
+func (router *Router) Handle(method string, path string, handle httprouter.Handle) {
+	path, handle = router.PrepareGroupStack(method, path, handle)
 	router.HttpRouter.Handle(method, path, handle)
 }
 
@@ -66,6 +90,7 @@ func (router *Router) PUT(path string, handle httprouter.Handle) {
 
 
 // 利用sync.Once方法实现单例模式生成Router对象
+// sync.Once 多goroutine也能保证实例的唯一性
 var router *Router
 var once sync.Once
 
