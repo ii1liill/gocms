@@ -21,6 +21,10 @@ func Get(key string) interface{} {
 	return value
 }
 
+func GetString(key string) string {
+	return viper.GetString(key)
+}
+
 //
 func GetWithCallback(key string, defaultValue interface{}) interface{} {
 	value := viper.Get(key)

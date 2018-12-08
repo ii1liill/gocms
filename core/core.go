@@ -2,9 +2,14 @@ package core
 
 import (
 	"fmt"
+
+	"net/http"
+
+	"github.com/gorilla/context"
+
+	"github.com/ii1liill/gocms/app/routes"
 	"github.com/ii1liill/gocms/core/config"
 	"github.com/ii1liill/gocms/core/http/router"
-	"net/http"
 )
 
 // 常用常量
@@ -26,7 +31,7 @@ type GoCms struct {
 // New 生成OCms对象的函数
 func New(configPath string) GoCms {
 	config.SetConfigPath(configPath)
-	bindAddr := config.Get("server.addr").(string)
+	bindAddr := config.GetString("server.addr")
 	if bindAddr == "" {
 		bindAddr = defaultServerAddr
 	}
@@ -44,5 +49,7 @@ func (o *GoCms) Run() error {
 	// 启动http服务器
 	fmt.Println("Service running!")
 	router := router.New()
-	return http.ListenAndServe(o.BindAddr, router.HttpRouter)
+	// 加载路由
+	routes.Boot()
+	return http.ListenAndServe(o.BindAddr, context.ClearHandler(router.HttpRouter))
 }
